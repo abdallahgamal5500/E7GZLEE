@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:icon="@drawable/ic_baseline_home_24"
+        android:title="Home"
+        android:id="@+id/home_nav"
+        android:checked="true"/>
+
+    <item android:icon="@drawable/credit_card_white_24"
+        android:title="My Ticket"
+        android:id="@+id/my_ticket_nav"/>
+
+    <item android:icon="@drawable/ic_baseline_settings_24"
+        android:title="Setting"
+        android:id="@+id/setting_nav"/>
+
+    <item android:icon="@drawable/ic_baseline_subdirectory_arrow_left_24"
+        android:title="Log out"
+        android:id="@+id/log_out_nav"/>
+
+</menu>

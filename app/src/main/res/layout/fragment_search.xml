@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="Fragments.FragmentSearch">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="#fff"
+        android:text="Search"
+        android:textSize="30dp"
+        android:gravity="center"
+        android:fontFamily="serif"
+        android:id="@+id/search_textview"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/search_cv_from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="50dp"
+        app:cardBackgroundColor="#fff"
+        app:cardElevation="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/search_textview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/search_from_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:fontFamily="serif"
+            android:text="From"
+            android:textSize="20dp"
+            app:ms_arrow_tint="#000"
+            app:ms_background_color="#fff"
+            app:ms_hint="From"
+            app:ms_padding_left="10dp"
+            app:ms_popup_padding_left="10dp"
+            app:ms_hint_color="#000"
+            app:ms_dropdown_max_height="200dp"
+            app:ms_text_color="#000"/>
+        </androidx.cardview.widget.CardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            app:layout_constraintTop_toBottomOf="@id/search_cv_from"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="#000"
+            android:layout_marginHorizontal="30dp"
+            android:id="@+id/search_from_line"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_cv_to"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="50dp"
+            app:cardBackgroundColor="#fff"
+            app:cardElevation="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/search_from_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.jaredrummler.materialspinner.MaterialSpinner
+                android:id="@+id/search_to_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:fontFamily="serif"
+                android:text="To"
+                android:textSize="20dp"
+                app:ms_arrow_tint="#000"
+                app:ms_padding_left="10dp"
+                app:ms_popup_padding_left="10dp"
+                app:ms_background_color="#fff"
+                app:ms_hint="To"
+                app:ms_hint_color="#000"
+                app:ms_dropdown_max_height="200dp"
+                app:ms_text_color="#000"/>
+        </androidx.cardview.widget.CardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            app:layout_constraintTop_toBottomOf="@id/search_cv_to"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="#000"
+            android:layout_marginHorizontal="30dp"
+            android:id="@+id/search_to_line"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_cv_class"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="50dp"
+            app:cardBackgroundColor="#fff"
+            app:cardElevation="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/search_to_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.jaredrummler.materialspinner.MaterialSpinner
+                android:id="@+id/search_class_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:fontFamily="serif"
+                android:text="Class"
+                android:textSize="20dp"
+                app:ms_arrow_tint="#000"
+                app:ms_padding_left="10dp"
+                app:ms_popup_padding_left="10dp"
+                app:ms_background_color="#fff"
+                app:ms_hint="Class"
+                app:ms_hint_color="#000"
+                app:ms_dropdown_max_height="200dp"
+                app:ms_text_color="#000"/>
+        </androidx.cardview.widget.CardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            app:layout_constraintTop_toBottomOf="@id/search_cv_class"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="#000"
+            android:layout_marginHorizontal="30dp"
+            android:id="@+id/search_class_line"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_cv_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="50dp"
+            app:cardBackgroundColor="#fff"
+            app:cardElevation="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/search_class_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:fontFamily="serif"
+                android:text="Date"
+                android:textSize="20dp"
+                android:gravity="center_vertical"
+                android:hint="Date"
+                android:textColor="#000"
+                android:paddingLeft="10dp"
+                android:id="@+id/search_date_tv"/>
+
+        </androidx.cardview.widget.CardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            app:layout_constraintTop_toBottomOf="@id/search_cv_date"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="#000"
+            android:layout_marginHorizontal="30dp"
+            android:id="@+id/search_date_line"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
