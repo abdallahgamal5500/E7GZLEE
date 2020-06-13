@@ -8,6 +8,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,35 +31,55 @@ import java.util.Locale;
 
 public class FragmentSearch extends Fragment {
 
-    private MaterialSpinner spinner;
+    private MaterialSpinner spinner_from, spinner_to, spinner_class;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
     private FirebaseAuth mAuth;
     private TextView textView;
+    Button btn;
     private Calendar calendar;
     private DatePickerDialog datePickerDialog;
     private int calender_day, calender_month, calender_year;
-    private String date,day_name;
-
+    private String from_value,to_value,class_value,date_value,day_name_value;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search,container,false);
 
-        spinner = view.findViewById(R.id.search_from_spinner);
+        spinner_from = view.findViewById(R.id.search_from_spinner);
+        spinner_to = view.findViewById(R.id.search_to_spinner);
+        spinner_class = view.findViewById(R.id.search_class_spinner);
         textView = view.findViewById(R.id.search_date_tv);
-        spinner.setItems("Cairo","Giza","Alexandria","Aswan");
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
-                String from = spinner.getText().toString();
-                if (from.equals("fsd")) {
-                }
-//                database = FirebaseDatabase.getInstance();
+        btn = view.findViewById(R.id.search_btn);
+
+        spinner_from.setItems("Alexandria","Aswan","Asyut","Banha","Bani Seuf","Cairo","Damanhour","Domyat","Giza","Ismailia","Luxor","Mansora","Menia","Port Said","Qena","Sohag","Tanta");
+        spinner_to.setItems("Alexandria","Aswan","Asyut","Banha","Bani Seuf","Cairo","Damanhour","Domyat","Giza","Ismailia","Luxor","Mansora","Menia","Port Said","Qena","Sohag","Tanta");
+        spinner_class.setItems("A","B","C","D");
+
+        database = FirebaseDatabase.getInstance();
 //                myRef = database.getReference("Users").child("child");
 //                mAuth = FirebaseAuth.getInstance();
 //                myRef.setValue(from);
+
+        spinner_from.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                from_value = spinner_from.getText().toString();
+            }
+        });
+
+        spinner_to.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                to_value = spinner_to.getText().toString();
+            }
+        });
+
+        spinner_class.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                class_value = spinner_class.getText().toString();
             }
         });
 
@@ -66,47 +87,92 @@ public class FragmentSearch extends Fragment {
             @Override
             public void onClick(View v) {
                 showDatePickerDialog();
-//                Calendar container = Calendar.getInstance();
-//                datePickerDialog = new DatePickerDialog(getContext(), R.style.MyDatePickerDialogTheme , new DatePickerDialog.OnDateSetListener() {
-//                    @Override
-//                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-//                        calendar.set(year,month-1,dayOfMonth);
-//                        int n = calendar.get(calendar.DAY_OF_WEEK);
-//                        String name = String.valueOf(n);
-//                        textView.setText(name);
-//                    }
-//                }, year, month, day);
-//                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis()); // Disable Past Date
-//                datePickerDialog.show();
             }
         });
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!validationFrom()) {
+                } else if (!validationTo()) {
+                } else if (!validationClass()) {
+                } else if (!validationDate()) {
+                } else {
+                    Toast.makeText(getContext(), "Fuck u", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         return view;
-
     }
-    public void showDatePickerDialog() {
 
-//        final int day = calendar.get(Calendar.DAY_OF_MONTH);
-//        int month = calendar.get(Calendar.MONTH);
-//        int year = calendar.get(Calendar.YEAR);
+    public void showDatePickerDialog() {
         datePickerDialog = new DatePickerDialog(getContext(), R.style.MyDatePickerDialogTheme , new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 String [] days = {"Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Monday", "Tuesday"};
                 calendar = Calendar.getInstance();
-                date = dayOfMonth + " - " + (month+1) + " - " + year ;
+                date_value = dayOfMonth + " - " + (month+1) + " - " + year ;
                 calendar.set(year,month-1,dayOfMonth);
-                day_name = days[calendar.get(calendar.DAY_OF_WEEK)-1];
-                textView.setText(date);
+                day_name_value = days[calendar.get(calendar.DAY_OF_WEEK)-1];
+                textView.setText(date_value);
             }
         }, calender_year, calender_month, calender_day);
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis()); // Disable Past Date
         datePickerDialog.show();
     }
-    public String getDayName(int day, int month, int year) {
-        calendar = Calendar.getInstance();
-        calendar.set(year,month-1,day);
-        String [] days = {"Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Monday", "Tuesday"};
-        int n = calendar.get(calendar.DAY_OF_WEEK);
-        return days[n-1];
+
+    public boolean validationFrom() {
+
+        if (from_value == null) {
+            spinner_from.setError("");
+            Toast.makeText(getContext(), "Please choose your going destination", Toast.LENGTH_LONG).show();;
+            return false;
+        } else {
+            spinner_from.setError(null);
+            return true;
+        }
     }
+
+    public boolean validationTo() {
+
+        if (to_value == null) {
+            spinner_to.setError("");
+            Toast.makeText(getContext(), "Please choose your arrival destination", Toast.LENGTH_LONG).show();;
+            return false;
+        } else if (from_value.equals(to_value)) {
+            spinner_from.setError("");
+            spinner_to.setError("");
+            Toast.makeText(getContext(), "Please choose different two destinations", Toast.LENGTH_LONG).show();
+            return false;
+        } else {
+            spinner_to.setError(null);
+            return true;
+        }
+    }
+
+    public boolean validationClass() {
+
+        if (class_value == null) {
+            spinner_class.setError("");
+            Toast.makeText(getContext(), "Please choose your train class", Toast.LENGTH_LONG).show();;
+            return false;
+        } else {
+            spinner_class.setError(null);
+            return true;
+        }
+    }
+
+    public boolean validationDate() {
+
+        if (date_value == null) {
+            textView.setError("");
+            Toast.makeText(getContext(), "Please choose your booking date", Toast.LENGTH_LONG).show();
+            return false;
+        } else {
+            textView.setError(null);
+            return true;
+        }
+    }
+
 }
