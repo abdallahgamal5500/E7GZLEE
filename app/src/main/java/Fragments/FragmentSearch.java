@@ -19,21 +19,27 @@ import androidx.fragment.app.Fragment;
 
 import com.example.e7gzle.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import Models.TEST;
 
 public class FragmentSearch extends Fragment {
 
     private MaterialSpinner spinner_from, spinner_to, spinner_class;
     private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private DatabaseReference myRef1,myRef2;
     private FirebaseAuth mAuth;
     private TextView textView;
     Button btn;
@@ -58,10 +64,8 @@ public class FragmentSearch extends Fragment {
         spinner_class.setItems("A","B","C","D");
 
         database = FirebaseDatabase.getInstance();
-//                myRef = database.getReference("Users").child("child");
-//                mAuth = FirebaseAuth.getInstance();
-//                myRef.setValue(from);
-
+        mAuth = FirebaseAuth.getInstance();
+        myRef1 = database.getReference("Ways");
         spinner_from.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
@@ -98,7 +102,92 @@ public class FragmentSearch extends Fragment {
                 } else if (!validationClass()) {
                 } else if (!validationDate()) {
                 } else {
-                    Toast.makeText(getContext(), "Fuck u", Toast.LENGTH_SHORT).show();
+
+                    myRef1.child("Cairo_Alex").child("Stations").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                String from = snapshot.getValue().toString();
+                                if (from.equals(from_value)) {
+                                    for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
+                                        String to = snapshot1.getValue().toString();
+                                        if (to.equals(to_value)) {
+                                            myRef1.child("Cairo_Alex").child("Stations").child("Classes").addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    for (DataSnapshot snapshot2 : dataSnapshot.getChildren()) {
+                                                        String class_name = snapshot2.getValue().toString();
+                                                        if (class_name.equals(class_value)) {
+                                                            if (class_value.equals("B")) {
+                                                                myRef1.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").addValueEventListener(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        for (DataSnapshot snapshot3 : dataSnapshot.getChildren()) {
+                                                                            String day = snapshot3.getValue().toString();
+                                                                            if (day.equals(day_name_value)) {
+
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
+                                                            } else if (class_value.equals("C")) {
+                                                                myRef1.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").addValueEventListener(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        for (DataSnapshot snapshot3 : dataSnapshot.getChildren()) {
+                                                                            String day = snapshot3.getValue().toString();
+                                                                            if (day.equals(day_name_value)) {
+
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
+                                                            } else if (class_value.equals("D")) {
+                                                                myRef1.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("D_days").addValueEventListener(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                        for (DataSnapshot snapshot3 : dataSnapshot.getChildren()) {
+                                                                            String day = snapshot3.getValue().toString();
+                                                                            if (day.equals(day_name_value)) {
+
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
         });
