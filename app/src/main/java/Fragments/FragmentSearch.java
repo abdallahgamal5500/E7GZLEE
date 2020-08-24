@@ -1,23 +1,28 @@
 package Fragments;
 
 import android.app.DatePickerDialog;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.example.e7gzle.Home;
 import com.example.e7gzle.R;
+import com.github.ybq.android.spinkit.style.Circle;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,32 +31,35 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
-import Models.TEST;
+import Models.Ticket;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 public class FragmentSearch extends Fragment {
 
     private MaterialSpinner spinner_from, spinner_to, spinner_class;
     private FirebaseDatabase database;
-    private DatabaseReference myRef1,myRef2;
-    private FirebaseAuth mAuth;
+    private DatabaseReference myRef1;
     private TextView textView;
     Button btn;
     private Calendar calendar;
     private DatePickerDialog datePickerDialog;
     private int calender_day, calender_month, calender_year;
-    private String from_value,to_value,class_value,date_value,day_name_value;
+    private String from_value,to_value,class_value,date_value,day_name_value,ticket_price,from_time,to_time;
+    public static String firebase_direction,firebase_class_days;
+    private int seats_number;
+    public static ArrayList <Ticket> arraylist;
+    private Ticket ticket;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search,container,false);
+        final View view = inflater.inflate(R.layout.fragment_search,container,false);
 
         spinner_from = view.findViewById(R.id.search_from_spinner);
         spinner_to = view.findViewById(R.id.search_to_spinner);
@@ -61,11 +69,13 @@ public class FragmentSearch extends Fragment {
 
         spinner_from.setItems("Alexandria","Aswan","Asyut","Banha","Bani Seuf","Cairo","Damanhour","Domyat","Giza","Ismailia","Luxor","Mansora","Menia","Port Said","Qena","Sohag","Tanta");
         spinner_to.setItems("Alexandria","Aswan","Asyut","Banha","Bani Seuf","Cairo","Damanhour","Domyat","Giza","Ismailia","Luxor","Mansora","Menia","Port Said","Qena","Sohag","Tanta");
-        spinner_class.setItems("A","B","C","D");
+        spinner_class.setItems("A","B","C");
 
         database = FirebaseDatabase.getInstance();
-        mAuth = FirebaseAuth.getInstance();
         myRef1 = database.getReference("Ways");
+
+        arraylist = new ArrayList<Ticket>();
+
         spinner_from.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
@@ -96,90 +106,290 @@ public class FragmentSearch extends Fragment {
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 if (!validationFrom()) {
                 } else if (!validationTo()) {
                 } else if (!validationClass()) {
                 } else if (!validationDate()) {
                 } else {
-
-                    myRef1.child("Cairo_Alex").child("Stations").addValueEventListener(new ValueEventListener() {
+                    myRef1.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                String from = snapshot.getValue().toString();
+                            for (DataSnapshot snapshot1 : dataSnapshot.child("Cairo_Alex").child("Stations").getChildren()) {
+                                String from = snapshot1.getValue().toString();
                                 if (from.equals(from_value)) {
-                                    for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
-                                        String to = snapshot1.getValue().toString();
+                                    for (DataSnapshot snapshot2 : dataSnapshot.child("Cairo_Alex").child("Stations").getChildren()) {
+                                        String to = snapshot2.getValue().toString();
                                         if (to.equals(to_value)) {
-                                            myRef1.child("Cairo_Alex").child("Stations").child("Classes").addValueEventListener(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    for (DataSnapshot snapshot2 : dataSnapshot.getChildren()) {
-                                                        String class_name = snapshot2.getValue().toString();
-                                                        if (class_name.equals(class_value)) {
-                                                            if (class_value.equals("B")) {
-                                                                myRef1.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").addValueEventListener(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        for (DataSnapshot snapshot3 : dataSnapshot.getChildren()) {
-                                                                            String day = snapshot3.getValue().toString();
-                                                                            if (day.equals(day_name_value)) {
-
-                                                                            }
+                                            for (DataSnapshot snapshot3 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").getChildren()) {
+                                                String class_name = snapshot3.getValue().toString();
+                                                if (class_name.equals(class_value)) {
+                                                    if (class_name.equals("A")) {
+                                                        for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("A_days").getChildren()) {
+                                                            String day = snapshot4.getValue().toString();
+                                                            if (day.equals(day_name_value)) {
+                                                                ticket_price = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("A_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").getChildren()) {
+                                                                    String train_number = snapshot5.getKey();
+                                                                    String seats = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                    seats_number = Integer.parseInt(seats);
+                                                                    if (seats_number > 0) {
+                                                                        from_time = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                        to_time = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                        float f_time = Float.parseFloat(from_time);
+                                                                        float t_time = Float.parseFloat(to_time);
+                                                                        if (f_time < t_time) {
+                                                                            ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                            arraylist.add(ticket);
+                                                                            firebase_direction = "Cairo_Alex";
+                                                                            firebase_class_days = "A_days";
                                                                         }
                                                                     }
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                    }
-                                                                });
-                                                            } else if (class_value.equals("C")) {
-                                                                myRef1.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").addValueEventListener(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        for (DataSnapshot snapshot3 : dataSnapshot.getChildren()) {
-                                                                            String day = snapshot3.getValue().toString();
-                                                                            if (day.equals(day_name_value)) {
-
-                                                                            }
+                                                                }
+                                                            }
+                                                        }
+                                                    } else if (class_name.equals("B")) {
+                                                        for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").getChildren()) {
+                                                            String day = snapshot4.getValue().toString();
+                                                            if (day.equals(day_name_value)) {
+                                                                ticket_price = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").getChildren()) {
+                                                                    String train_number = snapshot5.getKey();
+                                                                    String seats = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                    seats_number = Integer.parseInt(seats);
+                                                                    if (seats_number > 0) {
+                                                                        from_time = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                        to_time = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                        float f_time = Float.parseFloat(from_time);
+                                                                        float t_time = Float.parseFloat(to_time);
+                                                                        if (f_time < t_time) {
+                                                                            ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                            arraylist.add(ticket);
+                                                                            firebase_direction = "Cairo_Alex";
+                                                                            firebase_class_days = "B_days";
                                                                         }
                                                                     }
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                    }
-                                                                });
-                                                            } else if (class_value.equals("D")) {
-                                                                myRef1.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("D_days").addValueEventListener(new ValueEventListener() {
-                                                                    @Override
-                                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                        for (DataSnapshot snapshot3 : dataSnapshot.getChildren()) {
-                                                                            String day = snapshot3.getValue().toString();
-                                                                            if (day.equals(day_name_value)) {
-
-                                                                            }
+                                                                }
+                                                            }
+                                                        }
+                                                    } else if (class_name.equals("C")) {
+                                                        for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").getChildren()) {
+                                                            String day = snapshot4.getValue().toString();
+                                                            if (day.equals(day_name_value)) {
+                                                                ticket_price = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").getChildren()) {
+                                                                    String train_number = snapshot5.getKey();
+                                                                    String seats = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                    seats_number = Integer.parseInt(seats);
+                                                                    if (seats_number > 0) {
+                                                                        from_time = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                        to_time = dataSnapshot.child("Cairo_Alex").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                        float f_time = Float.parseFloat(from_time);
+                                                                        float t_time = Float.parseFloat(to_time);
+                                                                        if (f_time < t_time) {
+                                                                            ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                            arraylist.add(ticket);
+                                                                            firebase_direction = "Cairo_Alex";
+                                                                            firebase_class_days = "C_days";
                                                                         }
                                                                     }
-                                                                    @Override
-                                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                                    }
-                                                                });
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                }
-                                            });
+                                            }
                                         }
                                     }
                                 }
-
+                            }
+                            if (arraylist.size() == 0) {
+                                for (DataSnapshot snapshot1 : dataSnapshot.child("Cairo_Ismailia").child("Stations").getChildren()) {
+                                    String from = snapshot1.getValue().toString();
+                                    if (from.equals(from_value)) {
+                                        for (DataSnapshot snapshot2 : dataSnapshot.child("Cairo_Ismailia").child("Stations").getChildren()) {
+                                            String to = snapshot2.getValue().toString();
+                                            if (to.equals(to_value)) {
+                                                for (DataSnapshot snapshot3 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").getChildren()) {
+                                                    String class_name = snapshot3.getValue().toString();
+                                                    if (class_name.equals(class_value)) {
+                                                        if (class_name.equals("A")) {
+                                                            for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("A_days").getChildren()) {
+                                                                String day = snapshot4.getValue().toString();
+                                                                if (day.equals(day_name_value)) {
+                                                                    ticket_price = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("A_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                    for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").getChildren()) {
+                                                                        String train_number = snapshot5.getKey();
+                                                                        String seats = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                        seats_number = Integer.parseInt(seats);
+                                                                        if (seats_number > 0) {
+                                                                            from_time = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                            to_time = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                            float f_time = Float.parseFloat(from_time);
+                                                                            float t_time = Float.parseFloat(to_time);
+                                                                            if (f_time < t_time) {
+                                                                                ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                                arraylist.add(ticket);
+                                                                                firebase_direction = "Cairo_Ismailia";
+                                                                                firebase_class_days = "A_days";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else if (class_name.equals("B")) {
+                                                            for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("B_days").getChildren()) {
+                                                                String day = snapshot4.getValue().toString();
+                                                                if (day.equals(day_name_value)) {
+                                                                    ticket_price = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("B_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                    for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").getChildren()) {
+                                                                        String train_number = snapshot5.getKey();
+                                                                        String seats = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                        seats_number = Integer.parseInt(seats);
+                                                                        if (seats_number > 0) {
+                                                                            from_time = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                            to_time = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                            float f_time = Float.parseFloat(from_time);
+                                                                            float t_time = Float.parseFloat(to_time);
+                                                                            if (f_time < t_time) {
+                                                                                ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                                arraylist.add(ticket);
+                                                                                firebase_direction = "Cairo_Ismailia";
+                                                                                firebase_class_days = "B_days";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else if (class_name.equals("C")) {
+                                                            for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("C_days").getChildren()) {
+                                                                String day = snapshot4.getValue().toString();
+                                                                if (day.equals(day_name_value)) {
+                                                                    ticket_price = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("C_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                    for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").getChildren()) {
+                                                                        String train_number = snapshot5.getKey();
+                                                                        String seats = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                        seats_number = Integer.parseInt(seats);
+                                                                        if (seats_number > 0) {
+                                                                            from_time = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                            to_time = dataSnapshot.child("Cairo_Ismailia").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                            float f_time = Float.parseFloat(from_time);
+                                                                            float t_time = Float.parseFloat(to_time);
+                                                                            if (f_time < t_time) {
+                                                                                ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                                arraylist.add(ticket);
+                                                                                firebase_direction = "Cairo_Ismailia";
+                                                                                firebase_class_days = "C_days";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (arraylist.size() == 0) {
+                                for (DataSnapshot snapshot1 : dataSnapshot.child("Cairo_Aswan").child("Stations").getChildren()) {
+                                    String from = snapshot1.getValue().toString();
+                                    if (from.equals(from_value)) {
+                                        for (DataSnapshot snapshot2 : dataSnapshot.child("Cairo_Aswan").child("Stations").getChildren()) {
+                                            String to = snapshot2.getValue().toString();
+                                            if (to.equals(to_value)) {
+                                                for (DataSnapshot snapshot3 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").getChildren()) {
+                                                    String class_name = snapshot3.getValue().toString();
+                                                    if (class_name.equals(class_value)) {
+                                                        if (class_name.equals("A")) {
+                                                            for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("A_days").getChildren()) {
+                                                                String day = snapshot4.getValue().toString();
+                                                                if (day.equals(day_name_value)) {
+                                                                    ticket_price = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("A_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                    for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").getChildren()) {
+                                                                        String train_number = snapshot5.getKey();
+                                                                        String seats = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                        seats_number = Integer.parseInt(seats);
+                                                                        if (seats_number > 0) {
+                                                                            from_time = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                            to_time = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("A_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                            float f_time = Float.parseFloat(from_time);
+                                                                            float t_time = Float.parseFloat(to_time);
+                                                                            if (f_time < t_time) {
+                                                                                ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                                arraylist.add(ticket);
+                                                                                firebase_direction = "Cairo_Aswan";
+                                                                                firebase_class_days = "A_days";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else if (class_name.equals("B")) {
+                                                            for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("B_days").getChildren()) {
+                                                                String day = snapshot4.getValue().toString();
+                                                                if (day.equals(day_name_value)) {
+                                                                    ticket_price = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("B_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                    for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").getChildren()) {
+                                                                        String train_number = snapshot5.getKey();
+                                                                        String seats = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                        seats_number = Integer.parseInt(seats);
+                                                                        if (seats_number > 0) {
+                                                                            from_time = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                            to_time = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("B_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                            float f_time = Float.parseFloat(from_time);
+                                                                            float t_time = Float.parseFloat(to_time);
+                                                                            if (f_time < t_time) {
+                                                                                ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                                arraylist.add(ticket);
+                                                                                firebase_direction = "Cairo_Aswan";
+                                                                                firebase_class_days = "B_days";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else if (class_name.equals("C")) {
+                                                            for (DataSnapshot snapshot4 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("C_days").getChildren()) {
+                                                                String day = snapshot4.getValue().toString();
+                                                                if (day.equals(day_name_value)) {
+                                                                    ticket_price = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("C_days").child("Price").child("Ticket_price").getValue().toString();
+                                                                    for (DataSnapshot snapshot5 : dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").getChildren()) {
+                                                                        String train_number = snapshot5.getKey();
+                                                                        String seats = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Seats").getValue().toString();
+                                                                        seats_number = Integer.parseInt(seats);
+                                                                        if (seats_number > 0) {
+                                                                            from_time = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Time_on_station").child(from_value).getValue().toString();
+                                                                            to_time = dataSnapshot.child("Cairo_Aswan").child("Stations").child("Classes").child("Days").child("C_days").child("Trains").child(train_number).child("Time_on_station").child(to_value).getValue().toString();
+                                                                            float f_time = Float.parseFloat(from_time);
+                                                                            float t_time = Float.parseFloat(to_time);
+                                                                            if (f_time < t_time) {
+                                                                                ticket = new Ticket(from_value,to_value,class_value,date_value,day_name_value,ticket_price,train_number,from_time,to_time,seats_number);
+                                                                                arraylist.add(ticket);
+                                                                                firebase_direction = "Cairo_Aswan";
+                                                                                firebase_class_days = "C_days";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (arraylist.size() == 0) {
+                                Toast.makeText(getContext(), "No Result", Toast.LENGTH_LONG).show();
+                            }
+                            if (arraylist.size() > 0) {
+                                AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                                fragmentManager = activity.getSupportFragmentManager();
+                                Home.addFragment();
                             }
                         }
 
@@ -191,7 +401,6 @@ public class FragmentSearch extends Fragment {
                 }
             }
         });
-
         return view;
     }
 
@@ -207,7 +416,8 @@ public class FragmentSearch extends Fragment {
                 textView.setText(date_value);
             }
         }, calender_year, calender_month, calender_day);
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis()); // Disable Past Date
+        // This line to disable the last date
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.show();
     }
 

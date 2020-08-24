@@ -40,7 +40,7 @@
     -->
 
     <style name="MyDatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog" tools:targetApi="lollipop">
-        <item name="android:colorAccent" tools:targetApi="lollipop">#000</item>
+        <item name="android:colorAccent" tools:targetApi="lollipop">@color/colorAccent</item>
     </style>
 
 </resources>

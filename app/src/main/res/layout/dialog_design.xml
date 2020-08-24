@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="25dp"
+    app:cardBackgroundColor="#80000000">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dialog_text2"
+        android:layout_marginTop="50dp"
+        android:paddingLeft="12dp"
+        android:textColorHint="#fff"
+        android:textCursorDrawable="@drawable/white_cursor"
+        android:fontFamily="serif"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:layout_marginHorizontal="30dp"
+        android:background="@drawable/border_4"
+        android:id="@+id/dialog_text1"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@id/dialog_text1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dialog_btn_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="30dp"
+        android:paddingLeft="12dp"
+        android:textColorHint="#fff"
+        android:fontFamily="serif"
+        android:textCursorDrawable="@drawable/white_cursor"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/border_4"
+        android:id="@+id/dialog_text2"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_text2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dialog_btn_add"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="serif"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="50dp"
+        android:text="Cancel"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:background="@drawable/border_4"
+        android:id="@+id/dialog_btn_cancel"/>
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_text2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/dialog_btn_cancel"
+        android:layout_marginRight="30dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="serif"
+        android:layout_marginBottom="50dp"
+        android:text="EDIT"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:background="@drawable/border_4"
+        android:id="@+id/dialog_btn_add"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

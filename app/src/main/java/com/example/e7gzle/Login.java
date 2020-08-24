@@ -1,6 +1,7 @@
 package com.example.e7gzle;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+
+        getWindow().setBackgroundDrawableResource(R.drawable.login);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -82,7 +85,7 @@ public class Login extends AppCompatActivity {
                                             pass_layout.requestFocus();
                                         } else {
                                             progressBar.setVisibility(View.INVISIBLE);
-                                            Toast.makeText(getApplicationContext(), "No internet connection open WIFI or DATA", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), "No internet connection open WIFI or DATA", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
@@ -90,8 +93,6 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     public boolean validationEmail() {
@@ -141,4 +142,5 @@ public class Login extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
 }

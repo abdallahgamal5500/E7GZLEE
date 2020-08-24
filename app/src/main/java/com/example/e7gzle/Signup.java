@@ -57,7 +57,6 @@ public class Signup extends AppCompatActivity {
         circle = new Circle();
         progressBar.setIndeterminateDrawable(circle);
         progressBar.setVisibility(View.INVISIBLE);
-
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,7 +112,7 @@ public class Signup extends AppCompatActivity {
                                             email_layout.requestFocus();
                                         } else {
                                             progressBar.setVisibility(View.INVISIBLE);
-                                            Toast.makeText(getApplicationContext(),"No internet connection open WIFI or DATA",Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(),"No internet connection open WIFI or DATA",Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }

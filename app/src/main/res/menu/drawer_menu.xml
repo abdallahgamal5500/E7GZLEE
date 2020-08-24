@@ -3,6 +3,7 @@
 
     <item android:icon="@drawable/ic_baseline_home_24"
         android:title="Home"
+
         android:id="@+id/home_nav"
         android:checked="true"/>
 
